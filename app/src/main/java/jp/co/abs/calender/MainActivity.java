@@ -2,6 +2,8 @@ package jp.co.abs.calender;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,12 +36,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        Schedule test = new Schedule("minute", "hour", "schedule");
-//        Schedule test2 = new Schedule("minute", "hour", "schedule");
-//        Log.i("test", "1 " + test.equals(test));
-//        Log.i("test", "2 " + test2.equals(test2));
-//        Log.i("test", "3 " + test.equals(test2));
 
         mDateManager = new DateManager();
 
@@ -105,6 +101,32 @@ public class MainActivity extends AppCompatActivity {
                 final EditText scheduleHourEditText = (EditText) dialogView.findViewById(R.id.schedule_hour);
                 final EditText scheduleMinuteEditText = (EditText) dialogView.findViewById(R.id.schedule_minutes);
                 final EditText scheduleEditText = (EditText) dialogView.findViewById(R.id.dialog_edit_schedule);
+
+                InputFilter inputHourFilter = new InputFilter() {
+                    @Override
+                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                        String string = dest.toString() + source.toString();
+                        if (string.matches("^([2][0-3]|[0-1][0-9]|[0-9])$")) {
+                            return source;
+                        } else {
+                            return "";
+                        }
+                    }
+                };
+                scheduleHourEditText.setFilters(new InputFilter[]{inputHourFilter});
+
+                InputFilter inputMinuteFilter = new InputFilter() {
+                    @Override
+                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                        String string = dest.toString() + source.toString();
+                        if (string.matches("^([0-5][0-9]|[0-9])$")) {
+                            return source;
+                        } else {
+                            return "";
+                        }
+                    }
+                };
+                scheduleMinuteEditText.setFilters(new InputFilter[]{inputMinuteFilter});
 
                 //ListView内スケジュールの編集
                 scheduleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
