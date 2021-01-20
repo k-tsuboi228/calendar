@@ -1,0 +1,71 @@
+@startuml
+class MainActivity{
+- TextView mTitleText
+- CalendarAdapter mCalendarAdapter
+- DateManager mDateManager
+
+# void onCreate()
+}
+
+
+class DateManager{
+-Calendar mCalendar
+
++ Calendar getCalendar()
++ List<Date> getDays()
++ boolean isCurrentMonth(Date date)
++ int getWeeks()
++ int getDayOfWeek(Date date)
++ void nextMonth()
++ void prevMonth()
+}
+
+
+class PrefUtils{
+- {static} String PREF_NAME
+
+- {static} SharedPreferences getPreference(Context context)
+- {static} String convertKey(Date date)
+- {static} void write(Context context, Date date, String memo)
+- {static} String read(Context context, Date date)
+}
+
+
+class CalendarAdapter{
+- {static} Map<Integer, Integer> DAYS_COLOR
+- List<Date> mDateList
+- Context mContext
+- DateManager mDateManager;
+- LayoutInflater mLayoutInflater
+
++ int getCount()
++ View getView(int position, View convertView, ViewGroup parent)
++ long getItemId(int position)
++ Object getItem(int position)
++ String getTitle()
++ void notifyDataSetChanged()
+}
+
+
+class ViewHolder{
++ TextView dateText
++ TextView memoText
+}
+
+CalendarAdapter +-- ViewHolder
+
+'MainActivity o-- DateManager
+'MainActivity o-- CalendarAdapter
+'MainActivity o-- PrefUtils
+'CalendarAdapter *-- DateManager
+
+'MainActivity <-- DateManager
+'MainActivity <-- CalendarAdapter
+'MainActivity <-- PrefUtils
+'CalendarAdapter *-- DateManager
+
+MainActivity -- DateManager
+MainActivity -- CalendarAdapter
+MainActivity -- PrefUtils
+CalendarAdapter -- DateManager
+@enduml

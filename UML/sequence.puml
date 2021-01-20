@@ -1,0 +1,5 @@
+@startuml
+ユーザ -> MainActivity: アプリ起動
+
+
+@enduml

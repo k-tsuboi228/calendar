@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Calender</string>
+    <string name="modify_schedule_title">スケジュール変更</string>
+    <string name="add_schedule_title">スケジュール新規追加</string>
+</resources>
