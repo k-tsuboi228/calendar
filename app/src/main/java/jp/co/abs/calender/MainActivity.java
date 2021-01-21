@@ -1,6 +1,9 @@
 package jp.co.abs.calender;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -21,16 +24,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private TextView mTitleText;
     private CalendarAdapter mCalendarAdapter;
     private DateManager mDateManager;
     private Schedule mRemoveSchedule;
+    private static final int REQUEST_CODE = 1;
+    private static final String INTENT_NAME_REQUEST = "RequestCode";
+    private static final String INTENT_NAME_SCHEDULE_TEXT = "ScheduleText";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,6 +202,24 @@ public class MainActivity extends AppCompatActivity {
 
                                 // メモを保存する処理を入れる
                                 PrefUtils.write(MainActivity.this, selectedDate, scheduleList);
+
+                                Intent intent = new Intent(getApplicationContext(), AlarmNotification.class);
+                                intent.putExtra(INTENT_NAME_REQUEST, REQUEST_CODE);
+                                intent.putExtra(INTENT_NAME_SCHEDULE_TEXT, scheduleText);
+                                PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), REQUEST_CODE, intent, 0);
+
+                                // アラームをセットする
+                                AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+                                Calendar alarmTime = Calendar.getInstance();
+                                alarmTime.setTime(selectedDate);
+                                alarmTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(scheduleHour));
+                                alarmTime.set(Calendar.MINUTE, Integer.parseInt(scheduleMinute));
+
+                                if (am != null) {
+                                    am.setExact(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pending);
+                                    Log.i(TAG, "alarmTime: " + alarmTime);
+                                }
                             }
                         })
                         .create()
