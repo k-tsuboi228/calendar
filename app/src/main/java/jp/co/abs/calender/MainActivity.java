@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private CalendarAdapter mCalendarAdapter;
     private DateManager mDateManager;
     private Schedule mRemoveSchedule;
-    private static final int REQUEST_CODE = 1;
+
     private static final String INTENT_NAME_REQUEST = "RequestCode";
     private static final String INTENT_NAME_SCHEDULE_TEXT = "ScheduleText";
 
@@ -173,6 +173,9 @@ public class MainActivity extends AppCompatActivity {
                                         ((BaseAdapter) scheduleListView.getAdapter()).notifyDataSetChanged();
 
                                         mCalendarAdapter.notifyDataSetChanged();
+
+                                        //スケジュールを削除する場合、アラームを解除
+                                        deleteAlarm(removeSchedule);
                                     }
                                 })
                                 .create()
@@ -192,8 +195,9 @@ public class MainActivity extends AppCompatActivity {
                                 String scheduleHour = scheduleHourEditText.getText().toString();
                                 String scheduleMinute = scheduleMinuteEditText.getText().toString();
                                 String scheduleText = scheduleEditText.getText().toString();
+                                int requestCode = PrefUtils.nextRequestCode(MainActivity.this);
 
-                                Schedule schedule = new Schedule(scheduleMinute, scheduleHour, scheduleText);
+                                Schedule schedule = new Schedule(scheduleMinute, scheduleHour, scheduleText, requestCode);
 
                                 List<Schedule> scheduleList = PrefUtils.read(MainActivity.this, selectedDate);
 
@@ -203,23 +207,10 @@ public class MainActivity extends AppCompatActivity {
                                 // メモを保存する処理を入れる
                                 PrefUtils.write(MainActivity.this, selectedDate, scheduleList);
 
-                                Intent intent = new Intent(getApplicationContext(), AlarmNotification.class);
-                                intent.putExtra(INTENT_NAME_REQUEST, REQUEST_CODE);
-                                intent.putExtra(INTENT_NAME_SCHEDULE_TEXT, scheduleText);
-                                PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), REQUEST_CODE, intent, 0);
+                                //　スケジュール編集前のアラームを解除
+                                deleteAlarm(mRemoveSchedule);
 
-                                // アラームをセットする
-                                AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-                                Calendar alarmTime = Calendar.getInstance();
-                                alarmTime.setTime(selectedDate);
-                                alarmTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(scheduleHour));
-                                alarmTime.set(Calendar.MINUTE, Integer.parseInt(scheduleMinute));
-
-                                if (am != null) {
-                                    am.setExact(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pending);
-                                    Log.i(TAG, "alarmTime: " + alarmTime);
-                                }
+                                setAlarm(schedule, selectedDate);
                             }
                         })
                         .create()
@@ -228,4 +219,37 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // アラームの削除
+    private void deleteAlarm(Schedule schedule) {
+        if (schedule == null) return;
+        Intent intent = new Intent(getApplicationContext(), AlarmNotification.class);
+        PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), schedule.getRequestCode(), intent, 0);
+        // アラームを解除する
+        AlarmManager am = (AlarmManager) MainActivity.this.getSystemService(ALARM_SERVICE);
+        if (am != null) {
+            am.cancel(pending);
+        }
+    }
+
+    // アラームの登録
+    private void setAlarm(Schedule schedule, Date selectedDate) {
+        if (schedule == null || selectedDate == null) return;
+        Intent intent = new Intent(getApplicationContext(), AlarmNotification.class);
+        intent.putExtra(INTENT_NAME_REQUEST, schedule.getRequestCode());
+        intent.putExtra(INTENT_NAME_SCHEDULE_TEXT, schedule.getScheduleText());
+        PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), schedule.getRequestCode(), intent, 0);
+
+        // アラームをセットする
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        Calendar alarmTime = Calendar.getInstance();
+        alarmTime.setTime(selectedDate);
+        alarmTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(schedule.getHourText()));
+        alarmTime.set(Calendar.MINUTE, Integer.parseInt(schedule.getMinuteText()));
+
+        if (am != null) {
+            am.setExact(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pending);
+            Log.i(TAG, "alarmTime: " + alarmTime);
+        }
+    }
 }

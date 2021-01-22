@@ -17,6 +17,7 @@ import java.util.Locale;
 
 public class PrefUtils {
     private static final String PREF_NAME = "memo";
+    private static final String PREF_KEY_REQUEST_CODE = "RequestCode";
 
     private static SharedPreferences getPreference(Context context) {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -53,6 +54,20 @@ public class PrefUtils {
             }
         });
         return scheduleList;
+    }
+
+    /**
+     * 最新のリクエストコードを返す
+     *
+     * @param context 　Context
+     * @return 最新のリクエストコード
+     */
+    public static int nextRequestCode(Context context) {
+        int requestCode = getPreference(context).getInt(PREF_KEY_REQUEST_CODE, 0);
+        requestCode++;
+        getPreference(context).edit().putInt(PREF_KEY_REQUEST_CODE, requestCode).apply();
+
+        return requestCode;
     }
 
 }
