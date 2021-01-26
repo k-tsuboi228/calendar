@@ -2,4 +2,8 @@
     <string name="app_name">Calender</string>
     <string name="modify_schedule_title">スケジュール変更</string>
     <string name="add_schedule_title">スケジュール新規追加</string>
+    <string name="schedule_genre_work">work</string>
+    <string name="schedule_genre_private">private</string>
+    <string name="calendar_cell_text_work">● work</string>
+    <string name="calendar_cell_text_private">★ private</string>
 </resources>

@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -93,6 +94,13 @@ public class MainActivity extends AppCompatActivity {
 
                 TextView titleView = (TextView) dialogView.findViewById(R.id.dialog_title);
                 titleView.setText(format.format(selectedDate));
+
+                List<String> scheduleGenreList = new ArrayList<>();
+                for (ScheduleGenre scheduleGenre : ScheduleGenre.values()) {
+                    scheduleGenreList.add(getString(scheduleGenre.getGenreNameResId()));
+                }
+                final Spinner scheduleGenreSpinner = (Spinner) dialogView.findViewById(R.id.schedule_genre);
+                scheduleGenreSpinner.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, scheduleGenreList));
 
                 final ListView scheduleListView = dialogView.findViewById(R.id.schedule_list);
                 List<Schedule> list = PrefUtils.read(MainActivity.this, selectedDate);
@@ -196,8 +204,10 @@ public class MainActivity extends AppCompatActivity {
                                 String scheduleMinute = scheduleMinuteEditText.getText().toString();
                                 String scheduleText = scheduleEditText.getText().toString();
                                 int requestCode = PrefUtils.nextRequestCode(MainActivity.this);
+                                String selectedScheduleGenre = scheduleGenreSpinner.getSelectedItem().toString();
+                                ScheduleGenre scheduleGenre = ScheduleGenre.findGenre(selectedScheduleGenre, MainActivity.this);
 
-                                Schedule schedule = new Schedule(scheduleMinute, scheduleHour, scheduleText, requestCode);
+                                Schedule schedule = new Schedule(scheduleMinute, scheduleHour, scheduleText, requestCode, scheduleGenre);
 
                                 List<Schedule> scheduleList = PrefUtils.read(MainActivity.this, selectedDate);
 

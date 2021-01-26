@@ -71,6 +71,12 @@
 
     </LinearLayout>
 
+    <Spinner
+        android:id="@+id/schedule_genre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" />
+
     <EditText
         android:id="@+id/dialog_edit_schedule"
         android:layout_width="match_parent"

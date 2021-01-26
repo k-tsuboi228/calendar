@@ -69,11 +69,17 @@ public class CalendarAdapter extends BaseAdapter {
         SimpleDateFormat dateFormat = new SimpleDateFormat("d", Locale.US);
         holder.dateText.setText(dateFormat.format(mDateList.get(position)));
 
-        if(!PrefUtils.read(mContext,mDateList.get(position)).isEmpty()){
-            holder.memoText.setText("★");
-        }else{
-            holder.memoText.setText("");
+        List<Schedule> scheduleList = PrefUtils.read(mContext, mDateList.get(position));
+        StringBuilder genreText = new StringBuilder();
+        for (ScheduleGenre scheduleGenre : ScheduleGenre.values()) {
+            for (Schedule schedule : scheduleList) {
+                if (scheduleGenre == schedule.getScheduleGenre()) {
+                    genreText.append(mContext.getString(scheduleGenre.getCalendarCellTextResId()));
+                    break;
+                }
+            }
         }
+        holder.memoText.setText(genreText.toString());
 
         //当月以外のセルをグレーアウト
         if (mDateManager.isCurrentMonth(mDateList.get(position))) {

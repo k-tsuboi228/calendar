@@ -7,12 +7,14 @@ public class Schedule {
     private String mHourText;
     private String mScheduleText;
     private int mRequestCode;
+    private ScheduleGenre mScheduleGenre;
 
-    public Schedule(String minuteText, String hourText, String scheduleText, int requestCode) {
+    public Schedule(String minuteText, String hourText, String scheduleText, int requestCode, ScheduleGenre scheduleGenre) {
         mMinuteText = zeroPadding(minuteText);
         mHourText = zeroPadding(hourText);
         mScheduleText = scheduleText;
         mRequestCode = requestCode;
+        mScheduleGenre = scheduleGenre;
     }
 
     public String getMinuteText() {
@@ -29,6 +31,10 @@ public class Schedule {
 
     public int getRequestCode() {
         return mRequestCode;
+    }
+
+    public ScheduleGenre getScheduleGenre() {
+        return mScheduleGenre;
     }
 
     public String getTimeText() {
