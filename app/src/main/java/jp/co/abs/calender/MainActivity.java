@@ -103,16 +103,9 @@ public class MainActivity extends AppCompatActivity {
                 scheduleGenreSpinner.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, scheduleGenreList));
 
                 final ListView scheduleListView = dialogView.findViewById(R.id.schedule_list);
-                List<Schedule> list = PrefUtils.read(MainActivity.this, selectedDate);
 
-                final List<String> scheduleItemList = new ArrayList<>();
-
-                for (Schedule schedule : list) { // listの中身をscheduleに入れている
-                    String scheduleText = schedule.getTimeText() + "\t" + getString(schedule.getScheduleGenre().getGenreNameResId()) + "\t" + schedule.getScheduleText();
-                    scheduleItemList.add(scheduleText);
-                }
-
-                scheduleListView.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, scheduleItemList));
+                final List<Schedule> selectedDateScheduleList = PrefUtils.read(MainActivity.this, selectedDate);
+                scheduleListView.setAdapter(new ScheduleListAdapter(MainActivity.this, selectedDateScheduleList));
 
                 final EditText scheduleHourEditText = (EditText) dialogView.findViewById(R.id.schedule_hour);
                 final EditText scheduleMinuteEditText = (EditText) dialogView.findViewById(R.id.schedule_minutes);
@@ -179,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
                                         PrefUtils.write(MainActivity.this, selectedDate, scheduleList);
 
-                                        scheduleItemList.remove(position);
+                                        selectedDateScheduleList.remove(position);
                                         ((BaseAdapter) scheduleListView.getAdapter()).notifyDataSetChanged();
 
                                         mCalendarAdapter.notifyDataSetChanged();
