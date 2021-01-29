@@ -7,9 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -32,7 +35,7 @@ public class CalendarAdapter extends BaseAdapter {
     //カスタムセルを拡張したらここでWidgetを定義
     private static class ViewHolder {
         public TextView dateText;
-        public TextView memoText;
+        public List<ImageView> genreImageViewList;
     }
 
     public CalendarAdapter(Context context, DateManager dateManager) {
@@ -54,7 +57,14 @@ public class CalendarAdapter extends BaseAdapter {
             convertView = mLayoutInflater.inflate(R.layout.calender_cell, parent, false);
             holder = new ViewHolder();
             holder.dateText = convertView.findViewById(R.id.date_text);
-            holder.memoText = convertView.findViewById(R.id.memo_text);
+
+            holder.genreImageViewList = new ArrayList<>();
+            for (ScheduleGenre scheduleGenre : ScheduleGenre.values()) {
+                ImageView genreImage = new ImageView(mContext);
+                holder.genreImageViewList.add(genreImage);
+                LinearLayout linearLayout = (LinearLayout) convertView;
+                linearLayout.addView(genreImage);
+            }
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -70,16 +80,15 @@ public class CalendarAdapter extends BaseAdapter {
         holder.dateText.setText(dateFormat.format(mDateList.get(position)));
 
         List<Schedule> scheduleList = PrefUtils.read(mContext, mDateList.get(position));
-        StringBuilder genreText = new StringBuilder();
         for (ScheduleGenre scheduleGenre : ScheduleGenre.values()) {
+            holder.genreImageViewList.get(scheduleGenre.ordinal()).setImageDrawable(null);
             for (Schedule schedule : scheduleList) {
                 if (scheduleGenre == schedule.getScheduleGenre()) {
-                    genreText.append(mContext.getString(scheduleGenre.getCalendarCellTextResId()));
+                    holder.genreImageViewList.get(scheduleGenre.ordinal()).setImageResource(scheduleGenre.getGenreImageResId());
                     break;
                 }
             }
         }
-        holder.memoText.setText(genreText.toString());
 
         //当月以外のセルをグレーアウト
         if (mDateManager.isCurrentMonth(mDateList.get(position))) {

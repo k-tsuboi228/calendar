@@ -8,13 +8,6 @@
         android:id="@+id/date_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"/>
-
-    <!--ここに拡張可能-->
-    <TextView
-        android:id="@+id/memo_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        android:textAlignment="center" />
 
 </LinearLayout>

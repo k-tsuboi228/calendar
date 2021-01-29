@@ -4,6 +4,4 @@
     <string name="add_schedule_title">スケジュール新規追加</string>
     <string name="schedule_genre_work">仕事</string>
     <string name="schedule_genre_private">プライベート</string>
-    <string name="calendar_cell_text_work">● 仕事</string>
-    <string name="calendar_cell_text_private">★ プライベート</string>
 </resources>

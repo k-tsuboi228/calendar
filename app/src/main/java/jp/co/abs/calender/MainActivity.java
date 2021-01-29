@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 final List<String> scheduleItemList = new ArrayList<>();
 
                 for (Schedule schedule : list) { // listの中身をscheduleに入れている
-                    String scheduleText = schedule.getTimeText() + "\t" + schedule.getScheduleText();
+                    String scheduleText = schedule.getTimeText() + "\t" + getString(schedule.getScheduleGenre().getGenreNameResId()) + "\t" + schedule.getScheduleText();
                     scheduleItemList.add(scheduleText);
                 }
 
@@ -153,7 +153,9 @@ public class MainActivity extends AppCompatActivity {
                         scheduleHourEditText.setText(mRemoveSchedule.getHourText());
                         scheduleMinuteEditText.setText(mRemoveSchedule.getMinuteText());
                         scheduleEditText.setText(mRemoveSchedule.getScheduleText());
-
+                        scheduleGenreSpinner.setSelection(mRemoveSchedule.getScheduleGenre().ordinal());
+                        // 下記の方法であれば、リストの順序に限らず選択したスケジュールのジャンルをSpinnerにセットできる
+//                        scheduleGenreSpinner.setSelection(((ArrayAdapter<String>) scheduleGenreSpinner.getAdapter()).getPosition(getString(mRemoveSchedule.getScheduleGenre().getGenreNameResId())));
                         modifyScheduleTextView.setText(R.string.modify_schedule_title);
                     }
                 });
@@ -216,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
 
                                 // メモを保存する処理を入れる
                                 PrefUtils.write(MainActivity.this, selectedDate, scheduleList);
+
+                                mCalendarAdapter.notifyDataSetChanged();
 
                                 //　スケジュール編集前のアラームを解除
                                 deleteAlarm(mRemoveSchedule);

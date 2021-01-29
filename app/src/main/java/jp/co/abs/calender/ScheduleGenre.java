@@ -3,24 +3,24 @@ package jp.co.abs.calender;
 import android.content.Context;
 
 public enum ScheduleGenre {
-    WORK(R.string.schedule_genre_work, R.string.calendar_cell_text_work),
-    PRIVATE(R.string.schedule_genre_private, R.string.calendar_cell_text_private),
+    WORK(R.string.schedule_genre_work, R.drawable.ic_baseline_work_24),
+    PRIVATE(R.string.schedule_genre_private, R.drawable.ic_baseline_private_24),
     ;
 
     private int mGenreNameResId;
-    private int mCalendarCellTextResId;
+    private int mGenreImageResId;
 
-    ScheduleGenre(int genreNameResId, int calendarCellTextResId) {
+    ScheduleGenre(int genreNameResId, int genreImageResId) {
         mGenreNameResId = genreNameResId;
-        mCalendarCellTextResId = calendarCellTextResId;
+        mGenreImageResId = genreImageResId;
     }
 
     public int getGenreNameResId() {
         return mGenreNameResId;
     }
 
-    public int getCalendarCellTextResId() {
-        return mCalendarCellTextResId;
+    public int getGenreImageResId() {
+        return mGenreImageResId;
     }
 
     public static ScheduleGenre findGenre(String genreName, Context context) {
