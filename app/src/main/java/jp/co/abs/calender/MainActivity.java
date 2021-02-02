@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 final Date selectedDate = (Date) mCalendarAdapter.getItem(position);
 
                 Log.i("date", "" + mCalendarAdapter.getItem(position));
+                // FIXME ダイアログを別クラスに分離する
                 View dialogView = LayoutInflater.from(MainActivity.this).inflate(R.layout.custom_dialog, null);
 
                 final TextView modifyScheduleTextView = dialogView.findViewById(R.id.modify_schedule_text);

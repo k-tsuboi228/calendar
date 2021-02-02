@@ -10,7 +10,7 @@ import java.util.Locale;
 public class DateManager {
     private Calendar mCalendar;
 
-    public DateManager(){
+    public DateManager() {
         mCalendar = Calendar.getInstance();
     }
 
@@ -19,12 +19,12 @@ public class DateManager {
     }
 
     //当月の要素を取得
-    public List<Date> getDays(){
+    public List<Date> getDays() {
         //現在の状態を保持
         Date startDate = mCalendar.getTime();
 
         //GridViewに表示するマスの合計を計算
-        int dateCount = getWeeks() * 7 ;
+        int dateCount = getWeeks() * 7;
 
         //当月のカレンダーに表示される前月分の日数を計算
         mCalendar.set(Calendar.DATE, 1);
@@ -33,7 +33,7 @@ public class DateManager {
 
         List<Date> days = new ArrayList<>();
 
-        for (int i = 0; i < dateCount; i ++){
+        for (int i = 0; i < dateCount; i++) {
             days.add(mCalendar.getTime());
             mCalendar.add(Calendar.DATE, 1);
         }
@@ -44,15 +44,32 @@ public class DateManager {
         return days;
     }
 
-    //当月かどうか確認
-    public boolean isCurrentMonth(Date date){
+    /**
+     * 表示中の月かどうか確認
+     *
+     * @param date 確認したい日付
+     * @return true:表示中の月 false:表示中の月以外
+     */
+    public boolean isDisplayingMonth(Date date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy.MM", Locale.US);
         String currentMonth = format.format(mCalendar.getTime());
         return currentMonth.equals(format.format(date));
     }
 
+    /**
+     * 当日の日付かどうか確認
+     *
+     * @param date 　確認したい日付
+     * @return true:当日の日付 false:当日の日付以外
+     */
+    public boolean isCurrentDay(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd", Locale.US);
+        String currentDay = format.format(new Date());
+        return currentDay.equals(format.format(date));
+    }
+
     //週数を取得
-    public int getWeeks(){
+    public int getWeeks() {
         return mCalendar.getActualMaximum(Calendar.WEEK_OF_MONTH);
     }
 
@@ -64,12 +81,12 @@ public class DateManager {
     }
 
     //翌月へ
-    public void nextMonth(){
+    public void nextMonth() {
         mCalendar.add(Calendar.MONTH, 1);
     }
 
     //前月へ
-    public void prevMonth(){
+    public void prevMonth() {
         mCalendar.add(Calendar.MONTH, -1);
     }
 }

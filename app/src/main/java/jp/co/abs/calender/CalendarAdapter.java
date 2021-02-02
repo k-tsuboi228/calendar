@@ -90,10 +90,14 @@ public class CalendarAdapter extends BaseAdapter {
             }
         }
 
-        //当月以外のセルをグレーアウト
-        if (mDateManager.isCurrentMonth(mDateList.get(position))) {
+        if (mDateManager.isCurrentDay(mDateList.get(position))) {
+            // 当日の日付を黄色にする
+            convertView.setBackgroundColor(Color.YELLOW);
+        } else if (mDateManager.isDisplayingMonth(mDateList.get(position))) {
+            // 表示中の月の日付を白色にする
             convertView.setBackgroundColor(Color.WHITE);
         } else {
+            // 表示中の月以外の日付を灰色にする
             convertView.setBackgroundColor(Color.LTGRAY);
         }
 
