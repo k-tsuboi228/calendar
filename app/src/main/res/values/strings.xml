@@ -1,7 +1,12 @@
 <resources>
     <string name="app_name">Calender</string>
+    <string name="dialog_title">yyyy/MM/dd(E) \'Schedule\'</string>
     <string name="modify_schedule_title">スケジュール変更</string>
     <string name="add_schedule_title">スケジュール新規追加</string>
     <string name="schedule_genre_work">work</string>
     <string name="schedule_genre_private">private</string>
+    <string name="schedule_dialog_positive_button_text">save</string>
+    <string name="delete_confirm_dialog_title">Do you delete this schedule ?</string>
+    <string name="delete_confirm_dialog_positive_button_text">OK</string>
+    <string name="dialog_negative_button_text">Cancel</string>
 </resources>

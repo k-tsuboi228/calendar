@@ -60,4 +60,15 @@ public class ScheduleListAdapter extends BaseAdapter {
     public long getItemId(int position) {
         return position;
     }
+
+    /**
+     * スケジュールリストから指定したスケジュールを削除する
+     *
+     * @param schedule 削除したいスケジュール
+     */
+    public void remove(Schedule schedule) {
+        if (mScheduleList != null) {
+            mScheduleList.remove(schedule);
+        }
+    }
 }
