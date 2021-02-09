@@ -7,8 +7,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
@@ -46,6 +49,12 @@ public class ScheduleDialog extends DialogFragment {
     private Schedule mRemoveSchedule;
     private Date mDate;
     private OnUpdateScheduleListener mOnUpdateScheduleListener;
+
+    private AlertDialog mAlertDialog;
+
+    private EditText mScheduleHourEditText;
+    private EditText mScheduleMinuteEditText;
+    private EditText mScheduleEditText;
 
     /**
      * Instanceを生成する
@@ -91,13 +100,32 @@ public class ScheduleDialog extends DialogFragment {
         final List<Schedule> selectedDateScheduleList = PrefUtils.read(mContext, mDate);
         scheduleListView.setAdapter(new ScheduleListAdapter(mContext, selectedDateScheduleList));
 
-        final EditText scheduleHourEditText = (EditText) dialogView.findViewById(R.id.schedule_hour);
-        final EditText scheduleMinuteEditText = (EditText) dialogView.findViewById(R.id.schedule_minutes);
-        final EditText scheduleEditText = (EditText) dialogView.findViewById(R.id.dialog_edit_schedule);
-        final TextView modifyScheduleTextView = dialogView.findViewById(R.id.modify_schedule_text);
+        mScheduleHourEditText = (EditText) dialogView.findViewById(R.id.schedule_hour);
+        mScheduleMinuteEditText = (EditText) dialogView.findViewById(R.id.schedule_minutes);
+        mScheduleEditText = (EditText) dialogView.findViewById(R.id.dialog_edit_schedule);
 
-        setEditTextFilters(scheduleHourEditText, HOUR_REGEX);
-        setEditTextFilters(scheduleMinuteEditText, MINUTE_REGEX);
+        setEditTextFilters(mScheduleHourEditText, HOUR_REGEX);
+        setEditTextFilters(mScheduleMinuteEditText, MINUTE_REGEX);
+
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(isValidInputValue());
+            }
+        };
+        mScheduleHourEditText.addTextChangedListener(textWatcher);
+        mScheduleMinuteEditText.addTextChangedListener(textWatcher);
+        mScheduleEditText.addTextChangedListener(textWatcher);
+
+        final TextView modifyScheduleTextView = dialogView.findViewById(R.id.modify_schedule_text);
 
         //　ListView内スケジュールの編集
         scheduleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -105,9 +133,9 @@ public class ScheduleDialog extends DialogFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mRemoveSchedule = PrefUtils.read(mContext, mDate).get(position);
 
-                scheduleHourEditText.setText(mRemoveSchedule.getHourText());
-                scheduleMinuteEditText.setText(mRemoveSchedule.getMinuteText());
-                scheduleEditText.setText(mRemoveSchedule.getScheduleText());
+                mScheduleHourEditText.setText(mRemoveSchedule.getHourText());
+                mScheduleMinuteEditText.setText(mRemoveSchedule.getMinuteText());
+                mScheduleEditText.setText(mRemoveSchedule.getScheduleText());
                 scheduleGenreSpinner.setSelection(mRemoveSchedule.getScheduleGenre().ordinal());
                 modifyScheduleTextView.setText(R.string.modify_schedule_title);
             }
@@ -124,15 +152,15 @@ public class ScheduleDialog extends DialogFragment {
         });
 
         // スケジュールダイアログの作成処理
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext)
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext)
                 .setView(dialogView)
                 .setNegativeButton(mContext.getString(R.string.dialog_negative_button_text), null)
                 .setPositiveButton(mContext.getString(R.string.schedule_dialog_positive_button_text), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String scheduleHour = scheduleHourEditText.getText().toString();
-                        String scheduleMinute = scheduleMinuteEditText.getText().toString();
-                        String scheduleText = scheduleEditText.getText().toString();
+                        String scheduleHour = mScheduleHourEditText.getText().toString();
+                        String scheduleMinute = mScheduleMinuteEditText.getText().toString();
+                        String scheduleText = mScheduleEditText.getText().toString();
                         int requestCode = PrefUtils.nextRequestCode(mContext);
                         String selectedScheduleGenre = scheduleGenreSpinner.getSelectedItem().toString();
                         ScheduleGenre scheduleGenre = ScheduleGenre.findGenre(selectedScheduleGenre, mContext);
@@ -153,7 +181,16 @@ public class ScheduleDialog extends DialogFragment {
                         setAlarm(schedule, mDate);
                     }
                 });
-        return alertDialog.create();
+
+        mAlertDialog = alertDialogBuilder.create();
+
+        return mAlertDialog;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(isValidInputValue());
     }
 
     /**
@@ -175,6 +212,17 @@ public class ScheduleDialog extends DialogFragment {
             }
         };
         editText.setFilters(new InputFilter[]{inputHourFilter});
+    }
+
+    /**
+     * 有効な入力値かどうか確認する
+     *
+     * @return true: 有効な入力値 false: 無効な入力値
+     */
+    private boolean isValidInputValue() {
+        return !TextUtils.isEmpty(mScheduleHourEditText.getText().toString())
+                && !TextUtils.isEmpty(mScheduleMinuteEditText.getText().toString())
+                && !TextUtils.isEmpty(mScheduleEditText.getText().toString());
     }
 
     /**
