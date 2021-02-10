@@ -15,6 +15,7 @@ import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -107,6 +108,23 @@ public class ScheduleDialog extends DialogFragment {
         setEditTextFilters(mScheduleHourEditText, HOUR_REGEX);
         setEditTextFilters(mScheduleMinuteEditText, MINUTE_REGEX);
 
+        final ViewGroup cautionTextLayout = dialogView.findViewById(R.id.caution_layout);
+        final TextView cautionHourTextView = dialogView.findViewById(R.id.caution_hour_text);
+        final TextView cautionMinuteTextView = dialogView.findViewById(R.id.caution_minute_text);
+        final TextView cautionScheduleTextView = dialogView.findViewById(R.id.caution_schedule_text);
+
+        View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    setVisibility(cautionTextLayout, !isValidInputValue());
+                }
+            }
+        };
+        mScheduleHourEditText.setOnFocusChangeListener(onFocusChangeListener);
+        mScheduleMinuteEditText.setOnFocusChangeListener(onFocusChangeListener);
+        mScheduleEditText.setOnFocusChangeListener(onFocusChangeListener);
+
         TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -118,6 +136,11 @@ public class ScheduleDialog extends DialogFragment {
 
             @Override
             public void afterTextChanged(Editable s) {
+                setVisibility(cautionHourTextView, TextUtils.isEmpty(mScheduleHourEditText.getText()));
+                setVisibility(cautionMinuteTextView, TextUtils.isEmpty(mScheduleMinuteEditText.getText()));
+                setVisibility(cautionScheduleTextView, TextUtils.isEmpty(mScheduleEditText.getText()));
+                setVisibility(cautionTextLayout, !isValidInputValue());
+
                 mAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(isValidInputValue());
             }
         };
@@ -212,6 +235,16 @@ public class ScheduleDialog extends DialogFragment {
             }
         };
         editText.setFilters(new InputFilter[]{inputHourFilter});
+    }
+
+    /**
+     * Viewの表示/非表示を設定する
+     *
+     * @param view       表示/非表示を設定するView
+     * @param visibility true: 表示 false: 非表示
+     */
+    private void setVisibility(View view, boolean visibility) {
+        view.setVisibility(visibility ? View.VISIBLE : View.GONE);
     }
 
     /**

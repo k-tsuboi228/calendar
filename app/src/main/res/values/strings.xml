@@ -9,4 +9,8 @@
     <string name="delete_confirm_dialog_title">Do you delete this schedule ?</string>
     <string name="delete_confirm_dialog_positive_button_text">OK</string>
     <string name="dialog_negative_button_text">Cancel</string>
+    <string name="caution_text_title">*Cannot save because there are unfilled parts</string>
+    <string name="caution_text_hour">・ Hour</string>
+    <string name="caution_text_minute">・ Minute</string>
+    <string name="caution_text_schedule">・ Schedule</string>
 </resources>

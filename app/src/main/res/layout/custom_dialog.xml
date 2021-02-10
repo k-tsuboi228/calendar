@@ -85,4 +85,41 @@
         android:inputType="textLongMessage"
         android:maxLines="1" />
 
+    <LinearLayout
+        android:id="@+id/caution_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/caution_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/caution_text_title"
+            android:textColor="@android:color/holo_red_dark" />
+
+        <TextView
+            android:id="@+id/caution_hour_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/caution_text_hour"
+            android:textColor="@android:color/holo_red_dark" />
+
+        <TextView
+            android:id="@+id/caution_minute_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/caution_text_minute"
+            android:textColor="@android:color/holo_red_dark" />
+
+        <TextView
+            android:id="@+id/caution_schedule_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/caution_text_schedule"
+            android:textColor="@android:color/holo_red_dark" />
+
+    </LinearLayout>
+
 </LinearLayout>
