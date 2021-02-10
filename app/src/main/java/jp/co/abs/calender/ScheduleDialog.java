@@ -299,18 +299,23 @@ public class ScheduleDialog extends DialogFragment {
      */
     private void setAlarm(Schedule schedule, Date selectedDate) {
         if (schedule == null || selectedDate == null) return;
+
+        Calendar alarmTime = Calendar.getInstance();
+        alarmTime.setTime(selectedDate);
+        alarmTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(schedule.getHourText()));
+        alarmTime.set(Calendar.MINUTE, Integer.parseInt(schedule.getMinuteText()));
+        alarmTime.set(Calendar.SECOND, 0);
+        alarmTime.set(Calendar.MILLISECOND, 0);
+
+        // 過去の時間にスケジュールを登録する場合、アラームを登録しない
+        if (alarmTime.getTimeInMillis() < System.currentTimeMillis()) return;
+
         Intent intent = new Intent(mContext, AlarmNotification.class);
         intent.putExtra(INTENT_NAME_REQUEST, schedule.getRequestCode());
         intent.putExtra(INTENT_NAME_SCHEDULE_TEXT, schedule.getScheduleText());
         PendingIntent pending = PendingIntent.getBroadcast(mContext, schedule.getRequestCode(), intent, 0);
 
         AlarmManager am = (AlarmManager) mContext.getSystemService(ALARM_SERVICE);
-
-        Calendar alarmTime = Calendar.getInstance();
-        alarmTime.setTime(selectedDate);
-        alarmTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(schedule.getHourText()));
-        alarmTime.set(Calendar.MINUTE, Integer.parseInt(schedule.getMinuteText()));
-
         if (am != null) {
             am.setExact(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pending);
             Log.i(TAG, "alarmTime: " + alarmTime);
