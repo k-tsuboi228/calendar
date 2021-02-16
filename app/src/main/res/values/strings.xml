@@ -5,6 +5,7 @@
     <string name="add_schedule_title">スケジュール新規追加</string>
     <string name="schedule_genre_work">work</string>
     <string name="schedule_genre_private">private</string>
+    <string name="schedule_genre_school">school</string>
     <string name="schedule_dialog_positive_button_text">save</string>
     <string name="delete_confirm_dialog_title">Do you delete this schedule ?</string>
     <string name="delete_confirm_dialog_positive_button_text">OK</string>
@@ -13,4 +14,13 @@
     <string name="caution_text_hour">・ Hour</string>
     <string name="caution_text_minute">・ Minute</string>
     <string name="caution_text_schedule">・ Schedule</string>
+    <string name="prev_button_text">Prev</string>
+    <string name="next_button_text">Next</string>
+    <string name="day_text_sun">Sun</string>
+    <string name="day_text_mon">Mon</string>
+    <string name="day_text_tue">Tue</string>
+    <string name="day_text_wed">Wed</string>
+    <string name="day_text_thu">Thu</string>
+    <string name="day_text_fri">Fri</string>
+    <string name="day_text_sat">Sat</string>
 </resources>

@@ -5,6 +5,7 @@ import android.content.Context;
 public enum ScheduleGenre {
     WORK(R.string.schedule_genre_work, R.drawable.ic_baseline_work_24),
     PRIVATE(R.string.schedule_genre_private, R.drawable.ic_baseline_private_24),
+    SCHOOL(R.string.schedule_genre_school, R.drawable.ic_baseline_school_24),
     ;
 
     private int mGenreNameResId;

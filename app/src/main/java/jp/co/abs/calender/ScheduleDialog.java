@@ -15,13 +15,9 @@ import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import jp.co.abs.calender.databinding.CustomDialogBinding;
 
 import static android.content.Context.ALARM_SERVICE;
 
@@ -46,16 +44,13 @@ public class ScheduleDialog extends DialogFragment {
     private static final String INTENT_NAME_REQUEST = "RequestCode";
     private static final String INTENT_NAME_SCHEDULE_TEXT = "ScheduleText";
 
+    private CustomDialogBinding mBinding;
     private Context mContext;
     private Schedule mRemoveSchedule;
     private Date mDate;
     private OnUpdateScheduleListener mOnUpdateScheduleListener;
 
     private AlertDialog mAlertDialog;
-
-    private EditText mScheduleHourEditText;
-    private EditText mScheduleMinuteEditText;
-    private EditText mScheduleEditText;
 
     /**
      * Instanceを生成する
@@ -82,48 +77,36 @@ public class ScheduleDialog extends DialogFragment {
             mDate = (Date) getArguments().getSerializable(ARGS_KEY_DATE);
         }
 
-        View dialogView = requireActivity().getLayoutInflater().inflate(R.layout.custom_dialog, null);
+        mBinding = CustomDialogBinding.inflate(requireActivity().getLayoutInflater());
 
         Log.i(TAG, "date: " + mDate);
 
-        TextView titleView = (TextView) dialogView.findViewById(R.id.dialog_title);
         String titleText = (String) DateFormat.format(mContext.getString(R.string.dialog_title), mDate);
-        titleView.setText(titleText);
+        mBinding.dialogTitle.setText(titleText);
 
-        final Spinner scheduleGenreSpinner = (Spinner) dialogView.findViewById(R.id.schedule_genre);
         List<String> scheduleGenreList = new ArrayList<>();
         for (ScheduleGenre scheduleGenre : ScheduleGenre.values()) {
             scheduleGenreList.add(mContext.getString(scheduleGenre.getGenreNameResId()));
         }
-        scheduleGenreSpinner.setAdapter(new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, scheduleGenreList));
+        mBinding.scheduleGenre.setAdapter(new ArrayAdapter<>(mContext, android.R.layout.simple_list_item_1, scheduleGenreList));
 
-        final ListView scheduleListView = dialogView.findViewById(R.id.schedule_list);
         final List<Schedule> selectedDateScheduleList = PrefUtils.read(mContext, mDate);
-        scheduleListView.setAdapter(new ScheduleListAdapter(mContext, selectedDateScheduleList));
+        mBinding.scheduleList.setAdapter(new ScheduleListAdapter(mContext, selectedDateScheduleList));
 
-        mScheduleHourEditText = (EditText) dialogView.findViewById(R.id.schedule_hour);
-        mScheduleMinuteEditText = (EditText) dialogView.findViewById(R.id.schedule_minutes);
-        mScheduleEditText = (EditText) dialogView.findViewById(R.id.dialog_edit_schedule);
-
-        setEditTextFilters(mScheduleHourEditText, HOUR_REGEX);
-        setEditTextFilters(mScheduleMinuteEditText, MINUTE_REGEX);
-
-        final ViewGroup cautionTextLayout = dialogView.findViewById(R.id.caution_layout);
-        final TextView cautionHourTextView = dialogView.findViewById(R.id.caution_hour_text);
-        final TextView cautionMinuteTextView = dialogView.findViewById(R.id.caution_minute_text);
-        final TextView cautionScheduleTextView = dialogView.findViewById(R.id.caution_schedule_text);
+        setEditTextFilters(mBinding.scheduleHour, HOUR_REGEX);
+        setEditTextFilters(mBinding.scheduleMinutes, MINUTE_REGEX);
 
         View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    setVisibility(cautionTextLayout, !isValidInputValue());
+                    setVisibility(mBinding.cautionLayout, !isValidInputValue());
                 }
             }
         };
-        mScheduleHourEditText.setOnFocusChangeListener(onFocusChangeListener);
-        mScheduleMinuteEditText.setOnFocusChangeListener(onFocusChangeListener);
-        mScheduleEditText.setOnFocusChangeListener(onFocusChangeListener);
+        mBinding.scheduleHour.setOnFocusChangeListener(onFocusChangeListener);
+        mBinding.scheduleMinutes.setOnFocusChangeListener(onFocusChangeListener);
+        mBinding.dialogEditSchedule.setOnFocusChangeListener(onFocusChangeListener);
 
         TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -136,39 +119,37 @@ public class ScheduleDialog extends DialogFragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                setVisibility(cautionHourTextView, TextUtils.isEmpty(mScheduleHourEditText.getText()));
-                setVisibility(cautionMinuteTextView, TextUtils.isEmpty(mScheduleMinuteEditText.getText()));
-                setVisibility(cautionScheduleTextView, TextUtils.isEmpty(mScheduleEditText.getText()));
-                setVisibility(cautionTextLayout, !isValidInputValue());
+                setVisibility(mBinding.cautionHourText, TextUtils.isEmpty(mBinding.scheduleHour.getText()));
+                setVisibility(mBinding.cautionMinuteText, TextUtils.isEmpty(mBinding.scheduleMinutes.getText()));
+                setVisibility(mBinding.cautionScheduleText, TextUtils.isEmpty(mBinding.dialogEditSchedule.getText()));
+                setVisibility(mBinding.cautionLayout, !isValidInputValue());
 
                 mAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(isValidInputValue());
             }
         };
-        mScheduleHourEditText.addTextChangedListener(textWatcher);
-        mScheduleMinuteEditText.addTextChangedListener(textWatcher);
-        mScheduleEditText.addTextChangedListener(textWatcher);
-
-        final TextView modifyScheduleTextView = dialogView.findViewById(R.id.modify_schedule_text);
+        mBinding.scheduleHour.addTextChangedListener(textWatcher);
+        mBinding.scheduleMinutes.addTextChangedListener(textWatcher);
+        mBinding.dialogEditSchedule.addTextChangedListener(textWatcher);
 
         //　ListView内スケジュールの編集
-        scheduleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mBinding.scheduleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mRemoveSchedule = PrefUtils.read(mContext, mDate).get(position);
 
-                mScheduleHourEditText.setText(mRemoveSchedule.getHourText());
-                mScheduleMinuteEditText.setText(mRemoveSchedule.getMinuteText());
-                mScheduleEditText.setText(mRemoveSchedule.getScheduleText());
-                scheduleGenreSpinner.setSelection(mRemoveSchedule.getScheduleGenre().ordinal());
-                modifyScheduleTextView.setText(R.string.modify_schedule_title);
+                mBinding.scheduleHour.setText(mRemoveSchedule.getHourText());
+                mBinding.scheduleMinutes.setText(mRemoveSchedule.getMinuteText());
+                mBinding.dialogEditSchedule.setText(mRemoveSchedule.getScheduleText());
+                mBinding.scheduleGenre.setSelection(mRemoveSchedule.getScheduleGenre().ordinal());
+                mBinding.modifyScheduleText.setText(R.string.modify_schedule_title);
             }
         });
 
         // スケジュール削除処理
-        scheduleListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        mBinding.scheduleList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                showDeleteConfirmDialog(((ScheduleListAdapter) scheduleListView.getAdapter()), position);
+                showDeleteConfirmDialog(((ScheduleListAdapter) mBinding.scheduleList.getAdapter()), position);
 
                 return true;
             }
@@ -176,16 +157,16 @@ public class ScheduleDialog extends DialogFragment {
 
         // スケジュールダイアログの作成処理
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext)
-                .setView(dialogView)
+                .setView(mBinding.getRoot())
                 .setNegativeButton(mContext.getString(R.string.dialog_negative_button_text), null)
                 .setPositiveButton(mContext.getString(R.string.schedule_dialog_positive_button_text), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String scheduleHour = mScheduleHourEditText.getText().toString();
-                        String scheduleMinute = mScheduleMinuteEditText.getText().toString();
-                        String scheduleText = mScheduleEditText.getText().toString();
+                        String scheduleHour = mBinding.scheduleHour.getText().toString();
+                        String scheduleMinute = mBinding.scheduleMinutes.getText().toString();
+                        String scheduleText = mBinding.dialogEditSchedule.getText().toString();
                         int requestCode = PrefUtils.nextRequestCode(mContext);
-                        String selectedScheduleGenre = scheduleGenreSpinner.getSelectedItem().toString();
+                        String selectedScheduleGenre = mBinding.scheduleGenre.getSelectedItem().toString();
                         ScheduleGenre scheduleGenre = ScheduleGenre.findGenre(selectedScheduleGenre, mContext);
 
                         Schedule schedule = new Schedule(scheduleMinute, scheduleHour, scheduleText, requestCode, scheduleGenre);
@@ -253,9 +234,9 @@ public class ScheduleDialog extends DialogFragment {
      * @return true: 有効な入力値 false: 無効な入力値
      */
     private boolean isValidInputValue() {
-        return !TextUtils.isEmpty(mScheduleHourEditText.getText().toString())
-                && !TextUtils.isEmpty(mScheduleMinuteEditText.getText().toString())
-                && !TextUtils.isEmpty(mScheduleEditText.getText().toString());
+        return !TextUtils.isEmpty(mBinding.scheduleHour.getText().toString())
+                && !TextUtils.isEmpty(mBinding.scheduleMinutes.getText().toString())
+                && !TextUtils.isEmpty(mBinding.dialogEditSchedule.getText().toString());
     }
 
     /**

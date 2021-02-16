@@ -5,20 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.List;
+
+import jp.co.abs.calender.databinding.SchedulelistItemBinding;
 
 public class ScheduleListAdapter extends BaseAdapter {
     private LayoutInflater mLayoutInflater;
     private List<Schedule> mScheduleList;
-
-    private static class ViewHolder {
-        public ImageView genreImageView;
-        public TextView timeTextView;
-        public TextView scheduleTextView;
-    }
 
     public ScheduleListAdapter(Context context, List<Schedule> scheduleList) {
         mLayoutInflater = LayoutInflater.from(context);
@@ -32,23 +26,20 @@ public class ScheduleListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        SchedulelistItemBinding binding;
         if (convertView == null) {
-            convertView = mLayoutInflater.inflate(R.layout.schedulelist_item, parent, false);
-            holder = new ViewHolder();
-            holder.genreImageView = convertView.findViewById(R.id.genre_image);
-            holder.timeTextView = convertView.findViewById(R.id.time_text);
-            holder.scheduleTextView = convertView.findViewById(R.id.schedule_text);
-            convertView.setTag(holder);
+            binding = SchedulelistItemBinding.inflate(mLayoutInflater);
+            binding.getRoot().setTag(binding);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            binding = (SchedulelistItemBinding) convertView.getTag();
         }
         Schedule schedule = mScheduleList.get(position);
-        holder.genreImageView.setImageResource(schedule.getScheduleGenre().getGenreImageResId());
-        holder.timeTextView.setText(schedule.getTimeText());
-        holder.scheduleTextView.setText(schedule.getScheduleText());
 
-        return convertView;
+        binding.genreImage.setImageResource(schedule.getScheduleGenre().getGenreImageResId());
+        binding.timeText.setText(schedule.getTimeText());
+        binding.scheduleText.setText(schedule.getScheduleText());
+
+        return binding.getRoot();
     }
 
     @Override
