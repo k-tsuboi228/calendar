@@ -10,7 +10,6 @@ import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -26,10 +25,6 @@ public class PrefUtils {
     private static String convertKey(Date date) {
         return new SimpleDateFormat("yyyy/MM/dd", Locale.US).format(date);
     }
-
-//    public static void write(Context context, Date date, String memo) {
-//        getPreference(context).edit().putString(convertKey(date), memo).apply();
-//    }
 
     public static void write(Context context, Date date, List<Schedule> list) {
         Gson gson = new Gson();
@@ -47,12 +42,7 @@ public class PrefUtils {
         if (scheduleList == null) {
             return new ArrayList<Schedule>();
         }
-        Collections.sort(scheduleList, new Comparator<Schedule>() {
-            @Override
-            public int compare(Schedule o1, Schedule o2) {
-                return o1.getTimeText().compareTo(o2.getTimeText());
-            }
-        });
+        Collections.sort(scheduleList, (o1, o2) -> o1.getTimeText().compareTo(o2.getTimeText()));
         return scheduleList;
     }
 

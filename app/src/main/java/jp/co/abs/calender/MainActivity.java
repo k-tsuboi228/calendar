@@ -1,10 +1,9 @@
 package jp.co.abs.calender;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.util.Date;
 
@@ -16,9 +15,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String SCHEDULE_DIALOG_TAG = "ScheduleDialog";
 
     private ActivityMainBinding mBinding;
-
     private CalendarAdapter mCalendarAdapter;
-    private DateManager mDateManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,45 +23,20 @@ public class MainActivity extends AppCompatActivity {
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
 
-        mDateManager = new DateManager();
+        mBinding.setLifecycleOwner(this);
+        mBinding.setViewModel(new ViewModelProvider(this).get(MainViewModel.class));
+        mBinding.getViewModel().getTitleText().observe(this, s -> mCalendarAdapter.notifyDataSetChanged());
 
-        mBinding.prevButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDateManager.prevMonth();
-                mCalendarAdapter.notifyDataSetChanged();
-                mBinding.titleText.setText(mCalendarAdapter.getTitle());
-            }
-        });
-
-        mBinding.nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDateManager.nextMonth();
-                mCalendarAdapter.notifyDataSetChanged();
-                mBinding.titleText.setText(mCalendarAdapter.getTitle());
-            }
-        });
-
-        mCalendarAdapter = new CalendarAdapter(this, mDateManager);
+        mCalendarAdapter = new CalendarAdapter(this, mBinding.getViewModel().getDateManager());
         mBinding.calendarGridView.setAdapter(mCalendarAdapter);
-        mBinding.titleText.setText(mCalendarAdapter.getTitle());
 
-        final ScheduleDialog.OnUpdateScheduleListener onUpdateScheduleListener = new ScheduleDialog.OnUpdateScheduleListener() {
-            @Override
-            public void onUpdateSchedule() {
-                mCalendarAdapter.notifyDataSetChanged();
-            }
-        };
+        final ScheduleDialog.OnUpdateScheduleListener onUpdateScheduleListener = () -> mCalendarAdapter.notifyDataSetChanged();
 
-        mBinding.calendarGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                Date selectedDate = (Date) mCalendarAdapter.getItem(position);
-                ScheduleDialog scheduleDialog = ScheduleDialog.getInstance(selectedDate);
-                scheduleDialog.setOnUpdateScheduleListener(onUpdateScheduleListener);
-                scheduleDialog.show(getSupportFragmentManager(), SCHEDULE_DIALOG_TAG);
-            }
+        mBinding.calendarGridView.setOnItemClickListener((parent, view, position, id) -> {
+            Date selectedDate = (Date) mCalendarAdapter.getItem(position);
+            ScheduleDialog scheduleDialog = ScheduleDialog.getInstance(selectedDate);
+            scheduleDialog.setOnUpdateScheduleListener(onUpdateScheduleListener);
+            scheduleDialog.show(getSupportFragmentManager(), SCHEDULE_DIALOG_TAG);
         });
 
         ScheduleDialog scheduleDialog = (ScheduleDialog) getSupportFragmentManager().findFragmentByTag(SCHEDULE_DIALOG_TAG);

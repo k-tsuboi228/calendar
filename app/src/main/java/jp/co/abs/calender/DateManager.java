@@ -14,10 +14,6 @@ public class DateManager {
         mCalendar = Calendar.getInstance();
     }
 
-    public Calendar getCalendar() {
-        return mCalendar;
-    }
-
     //当月の要素を取得
     public List<Date> getDays() {
         //現在の状態を保持
@@ -78,6 +74,12 @@ public class DateManager {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return calendar.get(Calendar.DAY_OF_WEEK);
+    }
+
+    //表示月を取得
+    public String getTitle() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy.MM", Locale.US);
+        return format.format(mCalendar.getTime());
     }
 
     //翌月へ

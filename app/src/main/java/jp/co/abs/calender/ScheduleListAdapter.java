@@ -33,11 +33,7 @@ public class ScheduleListAdapter extends BaseAdapter {
         } else {
             binding = (SchedulelistItemBinding) convertView.getTag();
         }
-        Schedule schedule = mScheduleList.get(position);
-
-        binding.genreImage.setImageResource(schedule.getScheduleGenre().getGenreImageResId());
-        binding.timeText.setText(schedule.getTimeText());
-        binding.scheduleText.setText(schedule.getScheduleText());
+        binding.setSchedule(mScheduleList.get(position));
 
         return binding.getRoot();
     }

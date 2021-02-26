@@ -1,134 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/grayColor"
-    android:orientation="vertical"
-    tools:context="jp.co.abs.calender.MainActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:background="@color/whiteColor">
+    <data>
 
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:textSize="20sp" />
-
-        <Button
-            android:id="@+id/prevButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_marginVertical="10dp"
-            android:layout_marginStart="10dp"
-            android:background="@color/colorAccent"
-            android:text="@string/prev_button_text" />
-
-        <Button
-            android:id="@+id/nextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_marginVertical="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="@color/colorAccent"
-            android:text="@string/next_button_text" />
-    </RelativeLayout>
+        <variable
+            name="viewModel"
+            type="jp.co.abs.calender.MainViewModel" />
+    </data>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="1dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:background="@color/grayColor"
+        android:orientation="vertical"
+        tools:context="jp.co.abs.calender.MainActivity">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="1dp"
-            android:layout_weight="1"
-            android:background="@color/whiteColor"
-            android:text="@string/day_text_sun"
-            android:textAlignment="center"
-            android:textColor="@color/redColor" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:background="@color/whiteColor">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="1dp"
-            android:layout_weight="1"
-            android:background="@color/whiteColor"
-            android:text="@string/day_text_mon"
-            android:textAlignment="center"
-            android:textColor="@color/blackColor" />
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@{viewModel.titleText}"
+                android:textSize="20sp" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="1dp"
-            android:layout_weight="1"
-            android:background="@color/whiteColor"
-            android:text="@string/day_text_tue"
-            android:textAlignment="center"
-            android:textColor="@color/blackColor" />
+            <Button
+                android:id="@+id/prevButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_marginVertical="10dp"
+                android:layout_marginStart="10dp"
+                android:background="@color/colorAccent"
+                android:onClick="@{()-> viewModel.prevButtonOnClick()}"
+                android:text="@string/prev_button_text" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="1dp"
-            android:layout_weight="1"
-            android:background="@color/whiteColor"
-            android:text="@string/day_text_wed"
-            android:textAlignment="center"
-            android:textColor="@color/blackColor" />
+            <Button
+                android:id="@+id/nextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_marginVertical="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@color/colorAccent"
+                android:onClick="@{()-> viewModel.nextButtonOnClick()}"
+                android:text="@string/next_button_text" />
+        </RelativeLayout>
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="1dp"
-            android:layout_weight="1"
-            android:background="@color/whiteColor"
-            android:text="@string/day_text_thu"
-            android:textAlignment="center"
-            android:textColor="@color/blackColor" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="1dp"
+            android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="1dp"
-            android:layout_weight="1"
-            android:background="@color/whiteColor"
-            android:text="@string/day_text_fri"
-            android:textAlignment="center"
-            android:textColor="@color/blackColor" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="1dp"
+                android:layout_weight="1"
+                android:background="@color/whiteColor"
+                android:text="@string/day_text_sun"
+                android:textAlignment="center"
+                android:textColor="@color/redColor" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="1dp"
-            android:layout_weight="1"
-            android:background="@color/whiteColor"
-            android:text="@string/day_text_sat"
-            android:textAlignment="center"
-            android:textColor="@color/blueColor" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:background="@color/whiteColor"
+                android:text="@string/day_text_mon"
+                android:textAlignment="center"
+                android:textColor="@color/blackColor" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:background="@color/whiteColor"
+                android:text="@string/day_text_tue"
+                android:textAlignment="center"
+                android:textColor="@color/blackColor" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:background="@color/whiteColor"
+                android:text="@string/day_text_wed"
+                android:textAlignment="center"
+                android:textColor="@color/blackColor" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:background="@color/whiteColor"
+                android:text="@string/day_text_thu"
+                android:textAlignment="center"
+                android:textColor="@color/blackColor" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:background="@color/whiteColor"
+                android:text="@string/day_text_fri"
+                android:textAlignment="center"
+                android:textColor="@color/blackColor" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:background="@color/whiteColor"
+                android:text="@string/day_text_sat"
+                android:textAlignment="center"
+                android:textColor="@color/blueColor" />
+
+        </LinearLayout>
+
+        <GridView
+            android:id="@+id/calendarGridView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="1dp"
+            android:layout_weight="15"
+            android:horizontalSpacing="1dp"
+            android:numColumns="7"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="1dp" />
 
     </LinearLayout>
-
-    <GridView
-        android:id="@+id/calendarGridView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="1dp"
-        android:layout_weight="15"
-        android:horizontalSpacing="1dp"
-        android:numColumns="7"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="1dp" />
-
-</LinearLayout>
+</layout>

@@ -1,125 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- タイトル -->
-    <TextView
-        android:id="@+id/dialog_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="8dp"
-        android:gravity="center_horizontal"
-        android:textSize="20sp" />
+    <data>
 
-    <ListView
-        android:id="@+id/schedule_list"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        <import type="android.view.View" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:text="*スケジュールを変更する場合はリストをタップ" />
+        <import type="android.text.TextUtils" />
 
-    <TextView
-        android:id="@+id/modify_schedule_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/add_schedule_title"
-        android:textSize="20sp" />
+        <variable
+            name="viewModel"
+            type="jp.co.abs.calender.ScheduleDialogViewModel" />
+    </data>
 
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/schedule_hour"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="time"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="時"
-            android:textSize="20sp" />
-
-        <EditText
-            android:id="@+id/schedule_minutes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="time"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="分の予定"
-            android:textSize="20sp" />
-
-    </LinearLayout>
-
-    <Spinner
-        android:id="@+id/schedule_genre"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
-
-    <EditText
-        android:id="@+id/dialog_edit_schedule"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="スケジュールを入力してください。"
-        android:inputType="textLongMessage"
-        android:maxLines="1" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/caution_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
-
+        <!-- タイトル -->
         <TextView
-            android:id="@+id/caution_title"
+            android:id="@+id/dialog_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/caution_text_title"
-            android:textColor="@android:color/holo_red_dark" />
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:gravity="center_horizontal"
+            android:textSize="20sp" />
+
+        <ListView
+            android:id="@+id/schedule_list"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <TextView
-            android:id="@+id/caution_hour_text"
+            android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/caution_text_hour"
-            android:textColor="@android:color/holo_red_dark" />
+            android:layout_gravity="end"
+            android:text="*スケジュールを変更する場合はリストをタップ" />
 
         <TextView
-            android:id="@+id/caution_minute_text"
+            android:id="@+id/modify_schedule_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/caution_text_minute"
-            android:textColor="@android:color/holo_red_dark" />
+            android:layout_gravity="center_horizontal"
+            android:text="@string/add_schedule_title"
+            android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/caution_schedule_text"
+        <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/caution_text_schedule"
-            android:textColor="@android:color/holo_red_dark" />
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/schedule_hour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="time"
+                android:text="@={viewModel.hourText}"
+                android:textSize="20sp"
+                android:text_filter="@{`^([2][0-3]|[0-1][0-9]|[0-9])$`}" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="時"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/schedule_minutes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="time"
+                android:text="@={viewModel.minuteText}"
+                android:textSize="20sp"
+                android:text_filter="@{`^([0-5][0-9]|[0-9])$`}" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="分の予定"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <Spinner
+            android:id="@+id/schedule_genre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal" />
+
+        <EditText
+            android:id="@+id/dialog_edit_schedule"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="スケジュールを入力してください。"
+            android:inputType="textLongMessage"
+            android:maxLines="1"
+            android:text="@={viewModel.scheduleText}" />
+
+        <LinearLayout
+            android:id="@+id/caution_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/caution_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/caution_text_title"
+                android:textColor="@android:color/holo_red_dark" />
+
+            <TextView
+                android:id="@+id/caution_hour_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/caution_text_hour"
+                android:textColor="@android:color/holo_red_dark"
+                android:visibility="@{TextUtils.isEmpty(scheduleHour.text) ? View.VISIBLE : View.GONE}" />
+
+            <TextView
+                android:id="@+id/caution_minute_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/caution_text_minute"
+                android:textColor="@android:color/holo_red_dark"
+                android:visibility="@{TextUtils.isEmpty(scheduleMinutes.text) ? View.VISIBLE : View.GONE}" />
+
+            <TextView
+                android:id="@+id/caution_schedule_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/caution_text_schedule"
+                android:textColor="@android:color/holo_red_dark"
+                android:visibility="@{TextUtils.isEmpty(dialogEditSchedule.text) ? View.VISIBLE : View.GONE}" />
+
+        </LinearLayout>
 
     </LinearLayout>
-
-</LinearLayout>
+</layout>

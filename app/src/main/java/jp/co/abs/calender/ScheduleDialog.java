@@ -8,21 +8,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,9 +34,6 @@ public class ScheduleDialog extends DialogFragment {
     private static final String TAG = ScheduleDialog.class.getSimpleName();
 
     private static final String ARGS_KEY_DATE = "Date";
-
-    private static final String HOUR_REGEX = "^([2][0-3]|[0-1][0-9]|[0-9])$";
-    private static final String MINUTE_REGEX = "^([0-5][0-9]|[0-9])$";
 
     private static final String INTENT_NAME_REQUEST = "RequestCode";
     private static final String INTENT_NAME_SCHEDULE_TEXT = "ScheduleText";
@@ -93,21 +87,17 @@ public class ScheduleDialog extends DialogFragment {
         final List<Schedule> selectedDateScheduleList = PrefUtils.read(mContext, mDate);
         mBinding.scheduleList.setAdapter(new ScheduleListAdapter(mContext, selectedDateScheduleList));
 
-        setEditTextFilters(mBinding.scheduleHour, HOUR_REGEX);
-        setEditTextFilters(mBinding.scheduleMinutes, MINUTE_REGEX);
-
-        View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    setVisibility(mBinding.cautionLayout, !isValidInputValue());
-                }
+        View.OnFocusChangeListener onFocusChangeListener = (v, hasFocus) -> {
+            if (hasFocus) {
+                setVisibility(mBinding.cautionLayout, !isValidInputValue());
             }
         };
         mBinding.scheduleHour.setOnFocusChangeListener(onFocusChangeListener);
         mBinding.scheduleMinutes.setOnFocusChangeListener(onFocusChangeListener);
         mBinding.dialogEditSchedule.setOnFocusChangeListener(onFocusChangeListener);
 
+        mBinding.setLifecycleOwner(this);
+        mBinding.setViewModel(new ViewModelProvider(this).get(ScheduleDialogViewModel.class));
         TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -119,9 +109,6 @@ public class ScheduleDialog extends DialogFragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                setVisibility(mBinding.cautionHourText, TextUtils.isEmpty(mBinding.scheduleHour.getText()));
-                setVisibility(mBinding.cautionMinuteText, TextUtils.isEmpty(mBinding.scheduleMinutes.getText()));
-                setVisibility(mBinding.cautionScheduleText, TextUtils.isEmpty(mBinding.dialogEditSchedule.getText()));
                 setVisibility(mBinding.cautionLayout, !isValidInputValue());
 
                 mAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(isValidInputValue());
@@ -131,59 +118,50 @@ public class ScheduleDialog extends DialogFragment {
         mBinding.scheduleMinutes.addTextChangedListener(textWatcher);
         mBinding.dialogEditSchedule.addTextChangedListener(textWatcher);
 
-        //　ListView内スケジュールの編集
-        mBinding.scheduleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mRemoveSchedule = PrefUtils.read(mContext, mDate).get(position);
+        // ListView内スケジュールの編集
+        mBinding.scheduleList.setOnItemClickListener((parent, view, position, id) -> {
+            mRemoveSchedule = PrefUtils.read(mContext, mDate).get(position);
 
-                mBinding.scheduleHour.setText(mRemoveSchedule.getHourText());
-                mBinding.scheduleMinutes.setText(mRemoveSchedule.getMinuteText());
-                mBinding.dialogEditSchedule.setText(mRemoveSchedule.getScheduleText());
-                mBinding.scheduleGenre.setSelection(mRemoveSchedule.getScheduleGenre().ordinal());
-                mBinding.modifyScheduleText.setText(R.string.modify_schedule_title);
-            }
+            mBinding.scheduleHour.setText(mRemoveSchedule.getHourText());
+            mBinding.scheduleMinutes.setText(mRemoveSchedule.getMinuteText());
+            mBinding.dialogEditSchedule.setText(mRemoveSchedule.getScheduleText());
+            mBinding.scheduleGenre.setSelection(mRemoveSchedule.getScheduleGenre().ordinal());
+            mBinding.modifyScheduleText.setText(R.string.modify_schedule_title);
         });
 
         // スケジュール削除処理
-        mBinding.scheduleList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                showDeleteConfirmDialog(((ScheduleListAdapter) mBinding.scheduleList.getAdapter()), position);
+        mBinding.scheduleList.setOnItemLongClickListener((parent, view, position, id) -> {
+            showDeleteConfirmDialog(((ScheduleListAdapter) mBinding.scheduleList.getAdapter()), position);
 
-                return true;
-            }
+            return true;
         });
 
         // スケジュールダイアログの作成処理
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext)
                 .setView(mBinding.getRoot())
                 .setNegativeButton(mContext.getString(R.string.dialog_negative_button_text), null)
-                .setPositiveButton(mContext.getString(R.string.schedule_dialog_positive_button_text), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String scheduleHour = mBinding.scheduleHour.getText().toString();
-                        String scheduleMinute = mBinding.scheduleMinutes.getText().toString();
-                        String scheduleText = mBinding.dialogEditSchedule.getText().toString();
-                        int requestCode = PrefUtils.nextRequestCode(mContext);
-                        String selectedScheduleGenre = mBinding.scheduleGenre.getSelectedItem().toString();
-                        ScheduleGenre scheduleGenre = ScheduleGenre.findGenre(selectedScheduleGenre, mContext);
+                .setPositiveButton(mContext.getString(R.string.schedule_dialog_positive_button_text), (dialog, which) -> {
+                    String scheduleHour = mBinding.scheduleHour.getText().toString();
+                    String scheduleMinute = mBinding.scheduleMinutes.getText().toString();
+                    String scheduleText = mBinding.dialogEditSchedule.getText().toString();
+                    int requestCode = PrefUtils.nextRequestCode(mContext);
+                    String selectedScheduleGenre = mBinding.scheduleGenre.getSelectedItem().toString();
+                    ScheduleGenre scheduleGenre = ScheduleGenre.findGenre(selectedScheduleGenre, mContext);
 
-                        Schedule schedule = new Schedule(scheduleMinute, scheduleHour, scheduleText, requestCode, scheduleGenre);
+                    Schedule schedule = new Schedule(scheduleMinute, scheduleHour, scheduleText, requestCode, scheduleGenre);
 
-                        List<Schedule> scheduleList = PrefUtils.read(mContext, mDate);
-                        scheduleList.remove(mRemoveSchedule);
-                        scheduleList.add(schedule);
-                        PrefUtils.write(mContext, mDate, scheduleList);
+                    List<Schedule> scheduleList = PrefUtils.read(mContext, mDate);
+                    scheduleList.remove(mRemoveSchedule);
+                    scheduleList.add(schedule);
+                    PrefUtils.write(mContext, mDate, scheduleList);
 
-                        if (mOnUpdateScheduleListener != null) {
-                            mOnUpdateScheduleListener.onUpdateSchedule();
-                        }
-
-                        deleteAlarm(mRemoveSchedule);
-
-                        setAlarm(schedule, mDate);
+                    if (mOnUpdateScheduleListener != null) {
+                        mOnUpdateScheduleListener.onUpdateSchedule();
                     }
+
+                    deleteAlarm(mRemoveSchedule);
+
+                    setAlarm(schedule, mDate);
                 });
 
         mAlertDialog = alertDialogBuilder.create();
@@ -195,27 +173,6 @@ public class ScheduleDialog extends DialogFragment {
     public void onStart() {
         super.onStart();
         mAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(isValidInputValue());
-    }
-
-    /**
-     * EditTextに入力制限を設定する
-     *
-     * @param editText 入力制限を設定するEditText
-     * @param regex    入力制限の正規表現
-     */
-    private void setEditTextFilters(EditText editText, final String regex) {
-        InputFilter inputHourFilter = new InputFilter() {
-            @Override
-            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dStart, int dEnd) {
-                String string = dest.toString() + source.toString();
-                if (string.matches(regex)) {
-                    return source;
-                } else {
-                    return "";
-                }
-            }
-        };
-        editText.setFilters(new InputFilter[]{inputHourFilter});
     }
 
     /**
@@ -234,9 +191,9 @@ public class ScheduleDialog extends DialogFragment {
      * @return true: 有効な入力値 false: 無効な入力値
      */
     private boolean isValidInputValue() {
-        return !TextUtils.isEmpty(mBinding.scheduleHour.getText().toString())
-                && !TextUtils.isEmpty(mBinding.scheduleMinutes.getText().toString())
-                && !TextUtils.isEmpty(mBinding.dialogEditSchedule.getText().toString());
+        return !TextUtils.isEmpty(mBinding.scheduleHour.getText())
+                && !TextUtils.isEmpty(mBinding.scheduleMinutes.getText())
+                && !TextUtils.isEmpty(mBinding.dialogEditSchedule.getText());
     }
 
     /**
@@ -249,23 +206,20 @@ public class ScheduleDialog extends DialogFragment {
         new AlertDialog.Builder(mContext)
                 .setTitle(mContext.getString(R.string.delete_confirm_dialog_title))
                 .setNegativeButton(mContext.getString(R.string.dialog_negative_button_text), null)
-                .setPositiveButton(mContext.getString(R.string.delete_confirm_dialog_positive_button_text), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        List<Schedule> scheduleList = PrefUtils.read(mContext, mDate);
-                        Schedule removeSchedule = scheduleList.remove(position);
-                        PrefUtils.write(mContext, mDate, scheduleList);
+                .setPositiveButton(mContext.getString(R.string.delete_confirm_dialog_positive_button_text), (dialog, which) -> {
+                    List<Schedule> scheduleList = PrefUtils.read(mContext, mDate);
+                    Schedule removeSchedule = scheduleList.remove(position);
+                    PrefUtils.write(mContext, mDate, scheduleList);
 
-                        scheduleListAdapter.remove(removeSchedule);
-                        scheduleListAdapter.notifyDataSetChanged();
+                    scheduleListAdapter.remove(removeSchedule);
+                    scheduleListAdapter.notifyDataSetChanged();
 
-                        if (mOnUpdateScheduleListener != null) {
-                            mOnUpdateScheduleListener.onUpdateSchedule();
-                        }
-
-                        //スケジュールを削除する場合、アラームを解除
-                        deleteAlarm(removeSchedule);
+                    if (mOnUpdateScheduleListener != null) {
+                        mOnUpdateScheduleListener.onUpdateSchedule();
                     }
+
+                    //スケジュールを削除する場合、アラームを解除
+                    deleteAlarm(removeSchedule);
                 })
                 .create()
                 .show();

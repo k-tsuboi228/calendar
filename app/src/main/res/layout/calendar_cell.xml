@@ -1,19 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/date_text"
+    <data>
+
+        <variable
+            name="calendarAdapterData"
+            type="jp.co.abs.calender.CalendarAdapterData" />
+    </data>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center" />
+        android:layout_height="match_parent"
+        android:background="@{calendarAdapterData.backgroundColor}"
+        android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/genre_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        <TextView
+            android:id="@+id/date_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{calendarAdapterData.dateText}"
+            android:textAlignment="center"
+            android:textColor="@{calendarAdapterData.textColor}" />
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/genre_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:imageResource="@{calendarAdapterData.scheduleImageResourceId}" />
+
+    </LinearLayout>
+</layout>
